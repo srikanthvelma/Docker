@@ -63,7 +63,7 @@ docker image pull jenkins/jenkins
 * `docker container -it -p 30000:8080 amazoncorretto:17 myspc17 /bin/bash   --- (interactive mode)`
 * if you have already a running container we can create image out of it by `docker container commit`
 * `docker container commit <container name> <imagename>:<tag>`
-* `docker container run -d -p <host-port>:<container port> --name <containername> <imagename>:<tag> <any command>
+* `docker container run -d -p <host-port>:<container port> --name <containername> <imagename>:<tag> <any command>`
 ```
 docker container run -d -p 30001:8080 --name spc1 myspc:latest java -jar spring-petclinic-2.4.2.jar
 ```
@@ -106,6 +106,14 @@ ADD https://srikanthcicd.s3.ap-south-1.amazonaws.com/spring-petclinic-3.0.0-SNAP
 EXPOSE 8080
 CMD ["java", "-jar", "spring-petclinic-3.0.0-SNAPSHOT.jar"]
 ```
+* `exec` allow us to run any linux command
+* `docker container exec <container name> <command>`
+* ex: `docker container exec nginx1 printenv`
+* `docker container exec -it <c-name> <shell>` allow us to login in to container
+* `docker container exec -it nop1 /bin/bash`
+
+* **ENV** : we can define environmental variables by this
+* **ARG** : we define parameters by using this
 
 #### what is detached mode (-d)
 

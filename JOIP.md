@@ -66,7 +66,123 @@
 * `docker container rm -f <container name>`
   
 5. Explain what happens when you run the docker container
+* when we run docker container 
+  * first it will download the docker image from registry or local 
+  * and then creates a docker container
+  * and start that container
+  * After creation of container ,it will get
+    * new process tree
+    * disk mount or file system
+    * network -nic
+    * cpu/memory
+    * users
+
+6. Explain the Docker architecture
 
 
 
 
+15-04-2023
+----------
+1. write a Dockerfile for nodejs application 
+* `https://github.com/expressjs/express`
+
+* Manual steps 
+```
+
+```
+* Dcoker file for express nodejs
+```Dockerfile
+FROM node:16-alpine
+LABEL authour="srikanth" project="nodejs" org="qtdevops"
+RUN apk add git 
+RUN apk add npm
+RUN git clone https://github.com/expressjs/express.git 
+RUN cd express && npm install express && \
+npm install -g express-generator@4 && \
+express /tmp/foo && cd /tmp/foo && npm install 
+EXPOSE 3000
+WORKDIR /tmp/foo
+CMD [ "npm", "start" ]
+```
+`docker run --rm --entrypoint /bin/sh <image-name> -c "<any linux command>`
+ex: `docker run --rm --entrypoint /bin/sh <image-name> -c "cat /path/to/file"` to cat content
+* for execution
+* `docker image build -t node:v1.0.0`
+
+
+
+16-04-2023
+-----------
+1. create a mysqldb container from official mysql image 
+2. login into sql container and create a table
+```
+docker container run -d -P --name mysql -e MYSQL_ROOT_PASSWORD=srikanth -e MYSQL_DATABASE=employees \n
+-e MYSQL_USER=qtuser -e MYSQL_PASSWORD=srikanth mysql:8
+```
+![preview](images/dkr14.png)
+```
+ docker container exec -it mysql mysql --password=srikanth
+
+ mysql> use employees;
+
+  CREATE TABLE Persons (
+        PersonID int,
+        LastName varchar(255),
+        FirstName varchar(255),
+        Address varchar(255),
+        City varchar(255)
+    );
+
+Insert into Persons values (1,'velma','srikanth','suchitra','hyderabad'),(2,'velma','jyothi','suchitra','hyd'),(3,'velma','shreyan','suchitra','hyd'),(4,'velma','anvitha','suchitra','hyd');
+
+Select * from Persons;
+```
+![preview](images/dkr15.png)
+![preview](images/dkr16.png)
+
+3. try to create a persisted volume in mysql container and mount that to other
+```
+docker container run -d -P -v mydbvol1:/var/lib/mysql --name mysql -e MYSQL_ROOT_PASSWORD=srikanth \n
+-e MYSQL_DATABASE=employees -e MYSQL_USER=qtuser -e MYSQL_PASSWORD=srikanth mysql:8
+
+docker volume ls
+```
+![preview](images/dkr17.png)
+![preview](images/dkr18.png)
+* now to check persisted volume i am deleting mysql container 
+* and creating new one with mounting old vol to it
+![preview](images/dkr19.png)
+
+4. Now postgres database
+```
+ docker container run -d -P --name psqldb4 -e POSTGRES_ROOT_PASSWORD=srikanth57 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=srikanth57 -e POSTGRES_DB=employees postgres
+```
+![preview](images/dkr20.png)
+* got an error when we try to login with below command
+* ` docker container exec -it psqldb4 postgres --password=srikanth57`
+* error is 
+```
+"root" execution of the PostgreSQL server is not permitted.
+The server must be started under an unprivileged user ID to prevent
+possible system security compromise.  See the documentation for
+```
+* so login psql we try to login as below
+```
+docker container exec -it psqldb4 /bin/bash
+
+root@4a7d3cdd1ffd:/# psql -h localhost -U postgres
+```
+![preview](images/dkr21.png)
+* postgres database commands to create tables
+```
+postgres=# \c employees
+
+employees=# INSERT INTO persons5 VALUES (1,'srikanth','suchitra','hyd');
+employees=# SELECT * FROM persons5;
+```
+```
+employees=# INSERT INTO persons5 VALUES (2,'jyothi','suchitra','hyd'),(3,'anvi','suchitra','hyd'),(4,'shreyan','suchitra','hyd');
+employees=# SELECT * FROM persons5;
+```
+![preview](images/dkr22.png)
