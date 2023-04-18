@@ -186,3 +186,74 @@ employees=# INSERT INTO persons5 VALUES (2,'jyothi','suchitra','hyd'),(3,'anvi',
 employees=# SELECT * FROM persons5;
 ```
 ![preview](images/dkr22.png)
+
+
+
+18-04-2023
+#### 1. Create a alpine conatiner in interactive mode and install python
+* `docker container run -it --name python1 alpine /bin/sh`
+* `apk add --update python3`
+![preview](images/dkr23.png)
+
+#### 2. Create a ubuntu container with sleep 1d and then login using exec and install python
+* `docker container run -d --name python2 ubuntu sleep 1d`
+* `docker container ls`
+* `docker container exec -it python2 /bin/bash`
+* `apt update`
+![preview](images/dkr24.png)
+* `apt install python3 -y`
+![preview](images/dkr25.png)
+
+#### 3. Create a postgres container with username panoramic nad password as trekking .Try logging in and show the databases (query for pasql)
+* `docker conainer run -d -P --name psqldb1 -e POSTGRES_ROOT_PASSWORD=srikanth57 -e POSTGRES_USER=panoramic -e POSTGRES_PASSWORD=trekking -e POSTGRES_DB=employees postgres`
+* `docker container exec -it psqldb1 /bin/bash`
+* `psql -U panoramic --password -d employees` in bash terminal of container, it will ask for password 
+![preview](images/dkr26.png)
+![preview](images/dkr27.png)
+
+#### Try to create a dockerfile which runs phpinfo page, use ARG and ENV wherever appropriate on 1.apache, 2.nginx
+1. **apache**
+* Manual steps
+```
+sudo apt update
+sudo apt install apache2 -y
+sudo apt install php libapache2-mod-php -y
+```
+```Dockerfile
+FROM ubuntu:22.04
+LABEL author="srikanth" org="qt" project="LAMP"
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt update && \
+    apt install vim -y && \
+    apt install apache2 -y && \
+    apt install php -y && \
+    apt install libapache2-mod-php -y
+WORKDIR /var/www/html
+COPY /info.php /var/www/html/info.php
+EXPOSE 80
+CMD [ "apache2ctl","-D","FOREGROUND" ]
+ 
+```
+* created info.php file in local
+* `docker image build -t apache:v1.0.0 .`
+* `docker container run -d -P --name apachephp2 apache:v1.0.0`
+![preview](images/dkr28.png)
+![preview](images/dkr29.png)
+![preview](images/dkr30.png)
+
+2. **nginx**
+```Dockerfile
+FROM ubuntu:22.04
+LABEL author="srikanth" org="qt" project="LAMP"
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt update && \
+    apt install vim -y && \
+    apt install nginx -y && \
+    apt install php-fpm -y 
+WORKDIR /var/www/html
+COPY /info.php /var/www/html/info.php
+EXPOSE 80
+CMD [ "nginxctl","-D","FOREGROUND" ]
+
+```
+

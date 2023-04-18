@@ -116,5 +116,56 @@ CMD ["java", "-jar", "spring-petclinic-3.0.0-SNAPSHOT.jar"]
 * **ARG** : we define parameters by using this
 
 #### what is detached mode (-d)
+* Running container normally will take us to attached mode.
+* In detached mode container executes and gives us back the access to terminal.
+* Once we start the container in detached mode we can still view the STDOUT and STDERR by executing `docker container attach <container-name-or-id>`.
+* To exit from attach mode `Ctrl+PQ`
+#### Docker container will be in running state as long as command in cmd is running
+* Ex: if we give cmd in docker file like `CMD ["sleep","10s"]
+* so in above sys will sleep for 10s and container will moved to excited stateonce the command in CMD has finished executing.
+### Docker file for nop,gol
+### Docker Image layers
+* Docker image is collection of layers and some metadata
+* Docker image gets first set of layers from base image
+* Any Additional changes w.r.t ADD/COPY creates extra layers
+* Each RUN instruction which needs some storage creates layer
+* It is recommended to use Multiple commands in RUN instruction rather than multiple RUN instructions as this leads to too many layers
+* Docker has a filesystem which is aware of layers `overlay2`
+#### Containers and layers
+* When a container gets created all the effective read-only image layers are mounted as disk to the container
+* Docker creates a thin read write layer for each container.
+* Any changes made by container will be stored in this layer
+* Problem: when we delete container read write layer will be deleted.
+* [referhere][https://directdevops.blog/2019/09/26/docker-image-creation-and-docker-image-layers/] for the article on layers
+* [referhere][https://directdevops.blog/2019/09/27/impact-of-image-layers-on-docker-containers-storage-drivers/] for layers and storage drivers
+### Docker statefull applications and stateless
+* Stateful applications use local storage to store any state
+* Stateless applications use external systems (database, blobstorage etc) to store the state
+* We need not do anything special if your application is stateless in terms of writable layer, but if it stateful we need to preserve the state.
+#### Solving the Problem with Writable Layers
+* lets create mysql db container form official `mysql` image
+```
+docker container run -d --name mysqldb -e MYSQL_ROOT_PASSWORD=rootroot -e MYSQL_DATABASE=employees -e MYSQL_USER=qtdevops -e MYSQL_PASSWORD=rootroot -P mysql:8
+```
+* To login into container
+```
+docker container exec -it mysqldb mysql --password=rootroot
+```
+#### Docker volumes
+* Always ensure volumes are automatically created for the stateful applications as part of Dockerfile (VOLUME instruction)
+* Volumes are of two types
+    1. Explicity created (docker volume create myvol)
+    2. automatically created as part of container creation
+* Ensure we have knowledge on necessary folders where the data is stored and use volumes for it
+* for more db containers and creating with volumes `refer JOIP task on 16-04-2023 in joip.md`
+### Shell file to clean everything
+```
+#!/bin/bash
+docker container rm -f $(docker container ls -a -q)
+docker volume prune
+docker image rm -f $(docker image ls -q)
+```
 
-
+### Docker Networks
+* [referhere][https://directdevops.blog/2019/10/05/docker-networking-series-i/]
+* 
