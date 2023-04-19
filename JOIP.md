@@ -211,7 +211,7 @@ employees=# SELECT * FROM persons5;
 ![preview](images/dkr26.png)
 ![preview](images/dkr27.png)
 
-#### Try to create a dockerfile which runs phpinfo page, use ARG and ENV wherever appropriate on 1.apache, 2.nginx
+#### 4. Try to create a dockerfile which runs phpinfo page, use ARG and ENV wherever appropriate on 1.apache, 2.nginx
 1. **apache**
 * Manual steps
 ```
@@ -247,13 +247,71 @@ FROM ubuntu:22.04
 LABEL author="srikanth" org="qt" project="LAMP"
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update && \
-    apt install vim -y && \
     apt install nginx -y && \
-    apt install php-fpm -y 
-WORKDIR /var/www/html
+    apt install  php php-fpm -y 
 COPY /info.php /var/www/html/info.php
 EXPOSE 80
-CMD [ "nginxctl","-D","FOREGROUND" ]
+CMD ["nginx", "-g", "daemon off;"]
+```
+* `docker image build -t nginx:v1.0 .`
+* `docker container run -d -P --name nginx nginx:v1.0`
+![preview](images/dkr41.png)
+![preview](images/dkr42.png)
+
+#### 5. Create a jenkins image by craeting a own docker file
+* Dockerfile for jenkins image
+```Dockerfile
+FROM ubuntu:22.04
+LABEL author="srikanth" org="qt" project="Jenkins"
+RUN apt update && apt install curl -y
+RUN apt install openjdk-17-jdk -y
+RUN curl -fsSL https://pkg.jenkins.io/debian/jenkins.io-2023.key | tee \
+  /usr/share/keyrings/jenkins-keyring.asc > /dev/null && \
+  echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian binary/ | tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+RUN apt update && apt install jenkins -y 
+USER jenkins
+ENV JENKINS_HOME=/var/lib/jenkins
+EXPOSE 8080
+CMD [ "/usr/bin/jenkins" ]
 
 ```
+* here in above file important are `USER`,`JENKINS_HOME`,
+* `CMD - /usr/bin/jenkins - this is the ExecStart in jenkins.service file`
+* `docker image build -t jenkins:v1.0 .`
+* `docker container run -d -P --name jenkins jenkins:v1.0`
+* ![preview](images/dkr31.png)
+* ![preview](images/dkr32.png)
+* ![preview](images/dkr33.png)
+* ![preview](images/dkr34.png)
 
+#### 6. Create nop commerce and mysql server and try to make them work by configuring
+* first write a docker file for nop commerce
+```Dockerfile
+FROM mcr.microsoft.com/dotnet/sdk:7.0
+LABEL author="srikanthvelma" org="qt" project="docker"
+ADD https://github.com/nopSolutions/nopCommerce/releases/download/release-4.60.2/nopCommerce_4.60.2_NoSource_linux_x64.zip /nop/nopCommerce_4.60.2_NoSource_linux_x64.zip
+WORKDIR /nop
+RUN apt update && \
+apt install unzip -y && \
+unzip /nop/nopCommerce_4.60.2_NoSource_linux_x64.zip && \
+mkdir /nop/bin && mkdir /nop/logs
+EXPOSE 5000
+CMD [ "dotnet", "Nop.Web.dll", "--urls", "http://0.0.0.0:5000" ]
+```
+* build a docker image for nop `docker image build -t nop:v1.0 .`
+![preview](images/dkr35.png)
+* To configure nop and mysql -- 
+  * we have to create bridge network - mybridge
+  * create mysql with vol and in above network with env variables
+  * create a nop with passing MYSQL_SERVER variable passing above mysql name
+* `docker network create mybridge --subnet "10.0.0.0/24"`
+* ` docker container run -d --name mysql --network mybridge -v mysqlvol:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_USER=qtuser -e MYSQL_PASSWORD=srikanth57 mysql:8`
+* `docker container run -d -P --name nop --network mybridge -e MYSQL_SERVER=mysql nop:v1.0`
+![preview](images/dkr36.png)
+* next open the application by port of nop and try to pass mysql server details
+![preview](images/dkr38.png)
+![preview](images/dkr39.png)
+![preview](images/dkr40.png)
+![preview](images/dkr37.png)

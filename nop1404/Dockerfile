@@ -9,5 +9,3 @@ unzip /nop/nopCommerce_4.60.2_NoSource_linux_x64.zip && \
 mkdir /nop/bin && mkdir /nop/logs
 EXPOSE 5000
 CMD [ "dotnet", "Nop.Web.dll"]
-
- 
