@@ -1,0 +1,25 @@
+---
+Name: "Srikanth Velma"
+MobileNO: "986xxxxxx"
+Email: "vexxxxxxxxxxxxxxxxx@gmail.com"
+Education: 
+  - Degree:
+      Name: "B.Tech"
+      Stream: "Mechanical"
+      Yearofpassing: 2008
+      University: "KU"
+      Grade: "A"
+  - Inter: 
+      Name: "INTER"
+      Stream: "MPC"
+      Yearofpassing: 2004
+      University: "IPE"
+      Grade: "A"
+  - SSC:
+      Name: "SSC"
+      Stream: "SSC"
+      Yearofpassing: 2002
+      University: "SSC"
+      Grade: "A"
+  
+    
