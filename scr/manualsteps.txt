@@ -1,0 +1,10 @@
+Pre-requisites
+--------------
+1. python3 and pip
+
+Steps 
+-----
+git clone https://github.com/DevProjectsForDevOps/StudentCoursesRestAPI.git
+cd StudentCoursesRestAPT
+pip install -r requirements.txt
+python app.py

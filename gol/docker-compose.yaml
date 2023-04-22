@@ -1,0 +1,10 @@
+---
+version: '3.9'
+services:
+  gol:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gol
+    ports:
+      - 34500:8080
