@@ -35,3 +35,11 @@
   * Application can be installed and run from there
   * Better ROI
   ![preview](imagesdoc/doc4.png)
+* Gen-3 : Containers - are isolated areas which has vir-os ,looks like vms
+  ![preview](imagesdoc/doc5.png)
+### Docker
+* Docker is software used to create containers
+* Docker is a open platform to develop,shipping and for running applications
+* Docker enablse you to seperate your application with your infra, so that you deliver software quickly
+* 
+
